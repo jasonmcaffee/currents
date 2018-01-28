@@ -1,6 +1,12 @@
 //if Proxy is not natively supported, ensure polyfill is created.
 require('../vendor/reflect');
 
+export class EventBus{
+  constructor(){
+    return nn(new EventedProperty({name:'EventBus', fullPath:'EventBus'}));
+  }
+}
+
 /**
  * Returns an object which allows for safe navigation of properties.
  * When raw property values are needed, simply execute the property as a function.
@@ -10,18 +16,16 @@ require('../vendor/reflect');
  * nnObject.a() == 1
  * nnObject.non.existent.property.access() == undefined
  *
- * @param rawValue - object to be wrapped.
+ * @param eventedProperty - object to be wrapped.
  * @returns {Proxy}
  */
-const nn = (rawValue)=>{
-  console.log(`nn called with: `, rawValue);
-  //Each property accessed on a nevernull function-object will be this function.
-  //e.g. nn({}).prop1 is a function, which when executed, returns the passed in rawValue.
+const nn = (eventedProperty)=>{
+  console.log(`nn called with: `, eventedProperty);
   let triggerEventFunction = ()=>{
     console.log(`event triggered`);
     return undefined;
   };
-  triggerEventFunction.propertyData = rawValue;
+  triggerEventFunction.eventedProperty = eventedProperty;
 
   //intercept all property access on the wrappedValue function-object
   return new Proxy(triggerEventFunction, handler);
@@ -34,23 +38,15 @@ const nn = (rawValue)=>{
  */
 const handler = {
 
-  /**
-   * When a property is accessed, this function intercepts its access and instead returns a Proxy of a wrappedValue function.
-   * This allows us to do lazy recursion on all nested properties.
-   * @param triggerEventFunction - object which is being asked for the property with the name of the 'name' parameter.
-   * @param name - property name on the target who's value is needed.
-   * @returns {Proxy} - recursive call to nevernull is returned so accessing nested properties is always safe.
-   */
-  get: function(triggerEventFunction, name){
-    //get the raw target so we can access the raw property value.
-    let propertyData = triggerEventFunction.propertyData;
-    console.log(`propertyData is: `, propertyData);
+  get: function(parentTriggerEventFunction, name){
+    let parentEventedProperty = parentTriggerEventFunction.eventedProperty;
+    console.log(`parentEventedProperty is: `, parentEventedProperty);
     console.log(`name being accessed is: `, name);
 
-    let newPropertyData = {name, parent: propertyData, fullPath: `${propertyData.fullPath}.${name}`};
+    let eventedProperty = new EventedProperty({name, parentEventedProperty});
 
     //ensure the property is never null.
-    return nn(newPropertyData);
+    return nn(eventedProperty);
   },
 
   /**
@@ -74,4 +70,24 @@ const handler = {
  */
 const nnUndefinedProperty = nn(undefined);
 
-module.exports = nn;
+
+class EventedProperty{
+  constructor({parentEventedProperty, name, fullPath}){
+    this.callbacks = [];
+    this.fullPath =  fullPath ? fullPath : `${parentEventedProperty.fullPath}.${name}`;
+    this.name = name;
+  }
+  trigger(){
+
+  }
+  register(callback){
+    //return unregister function.
+  }
+  unregister(callback){
+
+  }
+}
+
+
+
+// module.exports = nn;
