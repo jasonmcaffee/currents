@@ -1,14 +1,14 @@
-const {EventBus, setObjectBasedOnFullPath} = require('./../build/occurence');
+const {Occurence, setObjectBasedOnFullPath} = require('./../build/occurence');
 
-describe("EventBus", ()=>{
+describe("Occurence", ()=>{
 
   it("should allow event firing, registering, and unregistering for any property typed.", ()=>{
-    //create the eventbus
-    let eventbus = new EventBus();
+    //create the o
+    let o = new Occurence();
 
     //register on event listener
     let eventListenerCallCount = 0;
-    let off = eventbus.person.name({on: (data, {name, fullPath, fullPathNames}) => {
+    let off = o.person.name({on: (data, {name, fullPath, fullPathNames}) => {
       console.log(`name on handler received data: `, data, `for name: ${name} fullPath: ${fullPath} fullPathNames: ${fullPathNames}`);
       //name on handler received data:  jason mcaffee for name: name fullPath: person.name fullPathNames: person,name
 
@@ -23,7 +23,7 @@ describe("EventBus", ()=>{
 
     //register event listener on parent object (person)
     let parentEventListenerCallCount = 0;
-    let off2 = eventbus.person({on:(data, {name, fullPath, fullPathNames}) =>{
+    let off2 = o.person({on:(data, {name, fullPath, fullPathNames}) =>{
       console.log(`person on handler received data: `, data, `for name: ${name} fullPath: ${fullPath} fullPathNames: ${fullPathNames}`);
       //person on handler received data:  jason mcaffee for name: name fullPath: person.name fullPathNames: person,name
 
@@ -37,13 +37,13 @@ describe("EventBus", ()=>{
     }});
 
     //fire event, expecting both the person.name and person event handlers to be called.
-    eventbus.person.name({fire:'jason mcaffee'});
+    o.person.name({fire:'jason mcaffee'});
 
     //unregister event handler
     off();
     off2();
 
-    eventbus.person.name({fire:'jason2'});
+    o.person.name({fire:'jason2'});
 
     expect(eventListenerCallCount).toEqual(1);
     expect(parentEventListenerCallCount).toEqual(1);
@@ -51,27 +51,27 @@ describe("EventBus", ()=>{
 
   describe("off", ()=>{
     it("should return an off function when on is called", ()=>{
-      let eventBus = new EventBus();
+      let o = new Occurence();
       let callCount = 0;
-      let off = eventBus.person.name({on:()=>{
+      let off = o.person.name({on:()=>{
         ++callCount;
       }});
-      eventBus.person.name({fire:'jason'});
+      o.person.name({fire:'jason'});
       off();
-      eventBus.person.name({fire:'ted'});
+      o.person.name({fire:'ted'});
       expect(callCount).toEqual(1);
     });
 
     it("should provide an off action which unregisters a callback", ()=>{
-      let eventBus = new EventBus();
+      let o = new Occurence();
       let callCount = 0;
       let callback = ()=>{
         ++callCount;
       }
-      eventBus.person.name({on:callback});
-      eventBus.person.name({fire:'jason'});
-      eventBus.person.name({off:callback});
-      eventBus.person.name({fire:'ted'});
+      o.person.name({on:callback});
+      o.person.name({fire:'jason'});
+      o.person.name({off:callback});
+      o.person.name({fire:'ted'});
       expect(callCount).toEqual(1);
     });
 
@@ -89,14 +89,14 @@ describe("EventBus", ()=>{
         },
       };
 
-      let eventBus = new EventBus();
-      eventBus.person({setObject:store.person});
-      eventBus.person.name({fire:'jason'});
-      eventBus.person.age({fire:38});
-      eventBus.person.friends({fire:'alison'});//default behavior is to add/push to arrays.
+      let o = new Occurence();
+      o.person({setObject:store.person});
+      o.person.name({fire:'jason'});
+      o.person.age({fire:38});
+      o.person.friends({fire:'alison'});//default behavior is to add/push to arrays.
 
       //set non existent property
-      eventBus.person.address.city({fire:'salt lake city'});
+      o.person.address.city({fire:'salt lake city'});
 
       expect(store.person.name).toEqual('jason');
       expect(store.person.age).toEqual(38);
@@ -121,20 +121,20 @@ describe("EventBus", ()=>{
 
     it("should demonstrate registering, firing, and unregistering events", ()=>{
       //create the eventbus
-      let eventbus = new EventBus();
+      let o = new Occurence();
 
       //register on event listener
-      let off = eventbus.person.name({on: (data, {name, fullPath, fullPathNames}) => {
+      let off = o.person.name({on: (data, {name, fullPath, fullPathNames}) => {
         console.log(`on handler received data: `, data, `for name: ${name} fullPath: ${fullPath} fullPathNames: ${fullPathNames}`);
       }});
 
       //fire event
-      eventbus.person.name({fire: 'jason mcaffee'});
+      o.person.name({fire: 'jason mcaffee'});
 
       //unregister event handler
       off();
 
-      eventbus.person.name({fire: 'jason'});
+      o.person.name({fire: 'jason'});
     });
 
     it("should demonstrate maintaining a global store/state", ()=>{
@@ -145,7 +145,7 @@ describe("EventBus", ()=>{
         }
       };
       //create the eventbus
-      let storeBus = new EventBus();
+      let storeBus = new Occurence();
 
       //register on event listener
       storeBus.person.name({on: (data) => {
