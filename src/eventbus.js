@@ -20,7 +20,7 @@ export class EventBus{
  * @returns {Proxy}
  */
 const nn = (eventedProperty)=>{
-  console.log(`nn called with: `, eventedProperty);
+  // console.log(`nn called with: `, eventedProperty);
 
   //when a property is invoked as a function, pass the call down to EventedProperty.handleAction, which will use passed
   //in data to determine which action to perform (fire, on, off)
@@ -45,8 +45,8 @@ const handler = {
 
   get: function(parentEventedPropertyActionFunc, name){
     let parentEventedProperty = parentEventedPropertyActionFunc.eventedProperty;
-    console.log(`parentEventedProperty is: `, parentEventedProperty);
-    console.log(`name being accessed is: `, name);
+    // console.log(`parentEventedProperty is: `, parentEventedProperty);
+    // console.log(`name being accessed is: `, name);
 
     //create a new evented property with the accessed name, if one doesn't already exist.
     if(parentEventedProperty.eventedProperties[name] === undefined){
@@ -85,11 +85,12 @@ class EventedProperty{
   constructor({parentEventedProperty, name, fullPath}){
     this.callbacks = [];
     this.fullPath =  fullPath ? fullPath : `${parentEventedProperty.fullPath}.${name}`;
+    this.fullPathNames = this.fullPath.split('.');
     this.name = name;
     this.eventedProperties = {};
   }
   fire(data){
-    console.log(`${this.fullPath} triggered with data: `, data);
+    // console.log(`${this.fullPath} triggered with data: `, data);
     for(let i = 0, len=this.callbacks.length; i < len; ++i){
       this.callbacks[i](data, this);
     }
@@ -99,7 +100,7 @@ class EventedProperty{
     this.callbacks.push(callback);
     let off = function(){
       let callbackIndex = this.callbacks.indexOf(callback);
-      console.log(`off removing callback at index`, callbackIndex);
+      // console.log(`off removing callback at index`, callbackIndex);
       if(callbackIndex < 0){return;}
       this.callbacks.splice(callbackIndex, 1);
       return callback;
