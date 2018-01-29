@@ -3,7 +3,7 @@ require('../vendor/reflect');
 
 export class EventBus{
   constructor(){
-    return nn(new EventedProperty({name:'EventBus', fullPath:'EventBus'}));
+    return nn(new EventedProperty({name:'event', fullPath:'event'}));
   }
 }
 
@@ -21,14 +21,19 @@ export class EventBus{
  */
 const nn = (eventedProperty)=>{
   console.log(`nn called with: `, eventedProperty);
-  let triggerEventFunction = ()=>{
-    console.log(`event triggered`);
-    return undefined;
+
+  //when a property is invoked as a function, pass the call down to EventedProperty.handleAction, which will use passed
+  //in data to determine which action to perform (fire, on, off)
+  //e.g. eventbus.person.name({fire:'some data'}) will invoke this function.
+  let eventedPropertyActionFunc = (action)=>{
+    let result = eventedProperty.handleAction(action);
+    return result;
   };
-  triggerEventFunction.eventedProperty = eventedProperty;
+  //attach eventedProperty so proxy has access.
+  eventedPropertyActionFunc.eventedProperty = eventedProperty;
 
   //intercept all property access on the wrappedValue function-object
-  return new Proxy(triggerEventFunction, handler);
+  return new Proxy(eventedPropertyActionFunc, handler);
 };
 
 /**
@@ -38,14 +43,19 @@ const nn = (eventedProperty)=>{
  */
 const handler = {
 
-  get: function(parentTriggerEventFunction, name){
-    let parentEventedProperty = parentTriggerEventFunction.eventedProperty;
+  get: function(parentEventedPropertyActionFunc, name){
+    let parentEventedProperty = parentEventedPropertyActionFunc.eventedProperty;
     console.log(`parentEventedProperty is: `, parentEventedProperty);
     console.log(`name being accessed is: `, name);
 
-    let eventedProperty = new EventedProperty({name, parentEventedProperty});
+    //create a new evented property with the accessed name, if one doesn't already exist.
+    if(parentEventedProperty.eventedProperties[name] === undefined){
+      parentEventedProperty.eventedProperties[name] = new EventedProperty({name, parentEventedProperty});
+    }
 
-    //ensure the property is never null.
+    let eventedProperty = parentEventedProperty.eventedProperties[name];
+
+    //wrap the eventedProperty with trigger function
     return nn(eventedProperty);
   },
 
@@ -76,15 +86,36 @@ class EventedProperty{
     this.callbacks = [];
     this.fullPath =  fullPath ? fullPath : `${parentEventedProperty.fullPath}.${name}`;
     this.name = name;
+    this.eventedProperties = {};
   }
-  trigger(){
-
+  fire(data){
+    console.log(`${this.fullPath} triggered with data: `, data);
+    for(let i = 0, len=this.callbacks.length; i < len; ++i){
+      this.callbacks[i](data, this);
+    }
   }
-  register(callback){
+  on(callback){
     //return unregister function.
+    this.callbacks.push(callback);
+    let off = function(){
+      let callbackIndex = this.callbacks.indexOf(callback);
+      console.log(`off removing callback at index`, callbackIndex);
+      if(callbackIndex < 0){return;}
+      this.callbacks.splice(callbackIndex, 1);
+      return callback;
+    }.bind(this);
+    return off;
   }
-  unregister(callback){
-
+  // off(callback){
+  //
+  // }
+  handleAction(action){
+    let propertyNames = Object.getOwnPropertyNames(action);
+    if(propertyNames.length != 1){ return console.error('invalid action: ', action); }
+    let actionName = propertyNames[0];
+    let actionValue = action[actionName];
+    if(typeof this[actionName] !== "function"){ return console.error('invalid action: ', action); }
+    return this[actionName](actionValue);
   }
 }
 

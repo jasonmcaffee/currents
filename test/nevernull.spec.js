@@ -3,11 +3,26 @@ const {EventBus} = require('./../build/eventbus');
 describe("nevernull", ()=>{
 
   it("should provide an api for access to raw values", ()=>{
-    // let base = {name: `eventbus`, fullPath: `eventbus`};
-    // let eventbus = nn(base);
-    // let test = eventbus.person.name;
+    //create the eventbus
     let eventbus = new EventBus();
-    let test = eventbus.person.name;
+
+    //register on event listener
+    let eventListenerCallCount = 0;
+    let off = eventbus.person.name({on: (data, {name, fullPath}) => {
+      console.log(`on handler received data: `, data, `for name: ${name} fullPath: ${fullPath}`);
+      expect(name).toEqual('name');
+      ++eventListenerCallCount;
+    }});
+
+    //fire event
+    eventbus.person.name({fire:'jason mcaffee'});
+
+    //unregister event handler
+    off();
+
+    eventbus.person.name({fire:'jason2'});
+
+    expect(eventListenerCallCount).toEqual(1);
   });
 
 
