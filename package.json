@@ -1,50 +1,40 @@
 {
-  "name": "nevernull",
-  "description": "Safe navigation of objects (avoid null pointer exceptions / avoid TypeError cannot access property 'x' of undefined)",
-  "version": "1.3.0",
+  "name": "occurence",
+  "description": "javascript eventbus",
+  "version": "1.0.0",
   "license": "MIT",
-  "homepage": "https://github.com/jasonmcaffee/nn",
+  "homepage": "https://github.com/jasonmcaffee/occurence",
   "author": {
     "name": "Jason McAffee",
     "email": "jasonlmcaffee@gmail.com",
-    "url": "http://nevernull.org/"
+    "url": "https://github.com/jasonmcaffee/occurence"
   },
   "keywords": [
-    "null pointer exception",
-    "never null",
-    "nn",
-    "TypeError cannot access property",
-    "TypeError cannot access property of undefined",
-    "of undefined",
-    "safe navigation",
-    "existential operator",
-    "elvis operator",
-    "optional chaining"
+    "eventbus",
+    "event bus",
+    "event-bus",
+    "redux alternative"
   ],
   "readmeFilename": "README.md",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jasonmcaffee/nn.git"
+    "url": "https://github.com/jasonmcaffee/occurence.git"
   },
   "engines": {
     "node": ">=6.0.0"
   },
   "scripts": {
-    "codio:download-node": "curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -",
-    "codio:install-node": "sudo apt-get install -y nodejs",
     "initial-setup": "npm install jasmine -g && npm install babel-cli -g && npm install && npm run build",
-    "initial-setup-for-codio": "npm run codio:download-node && npm run codio:install-node && npm run initial-setup",
     "test": "NODE_ENV=test-unit jasmine JASMINE_CONFIG_PATH=jasmine.json",
-    "test:performance": "node --expose-gc build/performance/test.js",
     "build-no-clean": "babel src test --out-dir build --source-maps",
     "build-watch": "babel src test --out-dir build --source-maps --watch",
     "clean": "rm -rf build",
     "build": "npm run clean && npm run build-no-clean",
-    "dist": "cp build/nevernull.js lib && cp build/nevernull.js.map lib",
+    "dist": "cp build/occurence.js lib && cp build/occurence.js.map lib",
     "build-dist": "npm run build && npm run dist"
   },
   "bugs": {
-    "url": "https://github.com/jasonmcaffee/nn/issues"
+    "url": "https://github.com/jasonmcaffee/occurence/issues"
   },
   "dependencies": {},
   "devDependencies": {
@@ -55,5 +45,5 @@
     "babel-plugin-transform-object-rest-spread": "^6.16.0",
     "jasmine": "2.4.1"
   },
-  "main": "./lib/nevernull.js"
+  "main": "./lib/occurence.js"
 }

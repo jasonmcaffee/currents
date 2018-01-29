@@ -1,4 +1,4 @@
-const {EventBus, setObjectBasedOnFullPath} = require('./../build/eventbus');
+const {EventBus, setObjectBasedOnFullPath} = require('./../build/occurence');
 
 describe("EventBus", ()=>{
 
