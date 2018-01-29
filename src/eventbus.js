@@ -79,7 +79,7 @@ class EventedProperty{
       setObjectBasedOnFullPath({objectToSet, fullPathNames: remainingFullPathNames, value});
     });
   }
-
+  //todo: once
   on(callback){
     this.callbacks.push(callback);
     let off = function(){

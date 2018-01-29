@@ -78,7 +78,7 @@ describe("EventBus", ()=>{
   });
 
   describe("setObject", ()=>{
-    fit("should provide a function for automatically setting properties based on event", ()=>{
+    it("should provide a function for automatically setting properties based on event", ()=>{
       let store = {
         person:{
           name: 'not set',
@@ -106,6 +106,8 @@ describe("EventBus", ()=>{
       expect(store.person.address.city).toEqual('salt lake city');
 
     });
+
+
     it("should set object values", ()=>{
       let objectToSet = {};
       setObjectBasedOnFullPath({objectToSet, fullPathNames:['person', 'name'], value:'jason'});
