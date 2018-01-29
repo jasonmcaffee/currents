@@ -7,18 +7,6 @@ export class EventBus{
   }
 }
 
-/**
- * Returns an object which allows for safe navigation of properties.
- * When raw property values are needed, simply execute the property as a function.
- *
- * e.g.
- * let nnObject = nn({ a: 1 });
- * nnObject.a() == 1
- * nnObject.non.existent.property.access() == undefined
- *
- * @param eventedProperty - object to be wrapped.
- * @returns {Proxy}
- */
 const nn = (eventedProperty)=>{
   // console.log(`nn called with: `, eventedProperty);
 
@@ -35,11 +23,6 @@ const nn = (eventedProperty)=>{
   return new Proxy(eventedPropertyActionFunc, handler);
 };
 
-/**
- * Proxy handler object.  Any time a property is read, get is executed first, allowing us to ensure the property value
- * is never null/undefined.
- * @type {{get: handler.get}}
- */
 const handler = {
 
   get: function(parentEventedPropertyActionFunc, name){
@@ -57,28 +40,7 @@ const handler = {
     //wrap the eventedProperty with trigger function
     return nn(eventedProperty);
   },
-
-  /**
-   * Conditionally sets the target[property].
-   * If the target has a value (ie is not undefined), property will be set to the value.
-   * If the target is undefined, the attempt to set the property will be ignored.
-   * @param target - target which contains the property we will set the value of.
-   * @param property - property name on the target which should be assigned value.
-   * @param value - value to assign to the target[property].
-   * @param receiver - the object to which the assignment was originally directed (usually the Proxy object).
-     */
-  set: function(target, property, value, receiver){
-    let rawTarget = target();
-    if(rawTarget === undefined){ return; }
-    rawTarget[property] = value;
-  }
 };
-
-/**
- * Cache the undefined version for speed.
- */
-const nnUndefinedProperty = nn(undefined);
-
 
 class EventedProperty{
   constructor({parentEventedProperty, name, fullPath}){
@@ -90,10 +52,6 @@ class EventedProperty{
     this.parentEventedProperty = parentEventedProperty;
   }
 
-  /**
-   * todo: bubble up to parent.
-   * @param data
-   */
   fire(data, context){
     context = context || this;
     // console.log(`${this.fullPath} triggered with data: `, data);
@@ -104,6 +62,7 @@ class EventedProperty{
       this.parentEventedProperty.fire(data, context);
     }
   }
+
   on(callback){
     //return unregister function.
     this.callbacks.push(callback);
@@ -142,14 +101,10 @@ function calculateFullPath({parentEventedProperty, name, fullPath}){
   }
   let calculatedFullPath;
   if(parentEventedProperty !== undefined){
-    let separator = parentEventedProperty && parentEventedProperty.fullPath !== '' ? '.' : '';
+    let separator = parentEventedProperty.fullPath !== '' ? '.' : '';
     calculatedFullPath = `${parentEventedProperty.fullPath}${separator}${name}`;
   }else{
     calculatedFullPath = name;
   }
   return calculatedFullPath;
 }
-
-
-
-// module.exports = nn;

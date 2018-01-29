@@ -10,7 +10,10 @@ describe("nevernull", ()=>{
     let eventListenerCallCount = 0;
     let off = eventbus.person.name({on: (data, {name, fullPath, fullPathNames}) => {
       console.log(`name on handler received data: `, data, `for name: ${name} fullPath: ${fullPath} fullPathNames: ${fullPathNames}`);
+      //name on handler received data:  jason mcaffee for name: name fullPath: person.name fullPathNames: person,name
+
       expect(name).toEqual('name');
+      expect(data).toEqual('jason mcaffee');
       expect(fullPath).toEqual('person.name');
       expect(fullPathNames.length).toEqual(2);
       expect(fullPathNames[0]).toEqual('person');
@@ -22,7 +25,10 @@ describe("nevernull", ()=>{
     let parentEventListenerCallCount = 0;
     let off2 = eventbus.person({on:(data, {name, fullPath, fullPathNames}) =>{
       console.log(`person on handler received data: `, data, `for name: ${name} fullPath: ${fullPath} fullPathNames: ${fullPathNames}`);
+      //person on handler received data:  jason mcaffee for name: name fullPath: person.name fullPathNames: person,name
+
       expect(name).toEqual('name');
+      expect(data).toEqual('jason mcaffee');
       expect(fullPath).toEqual('person.name');
       expect(fullPathNames.length).toEqual(2);
       expect(fullPathNames[0]).toEqual('person');
@@ -74,11 +80,11 @@ describe("nevernull", ()=>{
       let storeBus = new EventBus();
 
       //register on event listener
-      storeBus.person.name({on: (data, {name, fullPath, fullPathNames}) => {
+      storeBus.person.name({on: (data) => {
         store.person.name = data;
       }});
 
-      storeBus.person.age({on: (data, {name, fullPath, fullPathNames}) => {
+      storeBus.person.age({on: (data) => {
         store.person.age = data;
       }});
 
