@@ -90,13 +90,41 @@ describe("Occurence", ()=>{
       };
 
       let o = new Occurence();
-      o.person({setObject:store.person});
+      o.person({setObject:store.person}); //bad. need a name:'person' to enforce o.something.name doesn't set person.
       o.person.name({fire:'jason'});
       o.person.age({fire:38});
       o.person.friends({fire:'alison'});//default behavior is to add/push to arrays.
 
       //set non existent property
       o.person.address.city({fire:'salt lake city'});
+
+      expect(store.person.name).toEqual('jason');
+      expect(store.person.age).toEqual(38);
+      expect(store.person.friends.length).toEqual(1);
+      expect(store.person.friends[0]).toEqual('alison');
+      expect(store.person.address != undefined).toEqual(true);
+      expect(store.person.address.city).toEqual('salt lake city');
+
+    });
+
+    it("should provide a constructor option for automatically setting properties based on event", ()=>{
+      let store = {
+        person:{
+          name: 'not set',
+          friends:[],
+          // address:{   <-- doesn't exist, but will be created
+          //   city: ''
+          // }
+        },
+      };
+
+      let o = new Occurence({setObject:store});
+      o.store.person.name({fire:'jason'});
+      o.store.person.age({fire:38});
+      o.store.person.friends({fire:'alison'});//default behavior is to add/push to arrays.
+
+      //set non existent property
+      o.store.person.address.city({fire:'salt lake city'});
 
       expect(store.person.name).toEqual('jason');
       expect(store.person.age).toEqual(38);

@@ -2,8 +2,12 @@
 require('../vendor/reflect');
 
 export class Occurence{
-  constructor(){
-    return nn(new EventedProperty({name:'', fullPath:''}));
+  constructor({setObject}={}){
+    let result = nn(new EventedProperty({name:'', fullPath:''}));
+    if(setObject !== undefined){
+      result({setObject});
+    }
+    return result;
   }
 }
 
@@ -76,7 +80,8 @@ class EventedProperty{
       //omit the first fullPathName, since that represents the objectToSet.
       //e.g. eventBus.person({objectToSet: person});
       let [omit, ...remainingFullPathNames] = fullPathNames;
-      setObjectBasedOnFullPath({objectToSet, fullPathNames: remainingFullPathNames, value});
+      fullPathNames = remainingFullPathNames;
+      setObjectBasedOnFullPath({objectToSet, fullPathNames, value});
     });
   }
   //todo: once
@@ -140,7 +145,7 @@ function calculateFullPath({parentEventedProperty, name, fullPath}){
 }
 
 /**
- *
+ * todo: if value is an object, recursively grab it props and set. don't just assign value directly.
  * @param objectToSet
  * @param fullPathNames - e.g. ['person', 'name']
  * @param value - e.g. 'jason'
