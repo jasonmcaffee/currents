@@ -3,7 +3,7 @@ require('../vendor/reflect');
 
 export class EventBus{
   constructor(){
-    return nn(new EventedProperty({name:'event', fullPath:'event'}));
+    return nn(new EventedProperty({name:'', fullPath:''}));
   }
 }
 
@@ -26,8 +26,7 @@ const nn = (eventedProperty)=>{
   //in data to determine which action to perform (fire, on, off)
   //e.g. eventbus.person.name({fire:'some data'}) will invoke this function.
   let eventedPropertyActionFunc = (action)=>{
-    let result = eventedProperty.handleAction(action);
-    return result;
+    return eventedProperty.handleAction(action);
   };
   //attach eventedProperty so proxy has access.
   eventedPropertyActionFunc.eventedProperty = eventedProperty;
@@ -84,11 +83,16 @@ const nnUndefinedProperty = nn(undefined);
 class EventedProperty{
   constructor({parentEventedProperty, name, fullPath}){
     this.callbacks = [];
-    this.fullPath =  fullPath ? fullPath : `${parentEventedProperty.fullPath}.${name}`;
+    this.fullPath =  calculateFullPath({parentEventedProperty, name, fullPath});
     this.fullPathNames = this.fullPath.split('.');
     this.name = name;
     this.eventedProperties = {};
   }
+
+  /**
+   * todo: bubble up to parent.
+   * @param data
+   */
   fire(data){
     // console.log(`${this.fullPath} triggered with data: `, data);
     for(let i = 0, len=this.callbacks.length; i < len; ++i){
@@ -118,6 +122,27 @@ class EventedProperty{
     if(typeof this[actionName] !== "function"){ return console.error('invalid action: ', action); }
     return this[actionName](actionValue);
   }
+}
+
+/**
+ * the base evented property is the EventBus, which has a blank name and fullpath, so we don't want to include it in our event string names.
+ * @param parentEventedProperty
+ * @param name
+ * @param fullPath
+ * @returns {*}
+ */
+function calculateFullPath({parentEventedProperty, name, fullPath}){
+  if(fullPath){
+    return fullPath;
+  }
+  let calculatedFullPath;
+  if(parentEventedProperty !== undefined){
+    let separator = parentEventedProperty && parentEventedProperty.fullPath !== '' ? '.' : '';
+    calculatedFullPath = `${parentEventedProperty.fullPath}${separator}${name}`;
+  }else{
+    calculatedFullPath = name;
+  }
+  return calculatedFullPath;
 }
 
 
