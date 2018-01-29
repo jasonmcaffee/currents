@@ -83,19 +83,27 @@ describe("EventBus", ()=>{
         person:{
           name: 'not set',
           friends:[],
+          // address:{   <-- doesn't exist, but will be created
+          //   city: ''
+          // }
         },
       };
 
       let eventBus = new EventBus();
-      eventBus.person({setObject:store});
+      eventBus.person({setObject:store.person});
       eventBus.person.name({fire:'jason'});
       eventBus.person.age({fire:38});
-      eventBus.person.friends({fire:'alison'});
+      eventBus.person.friends({fire:'alison'});//default behavior is to add/push to arrays.
+
+      //set non existent property
+      eventBus.person.address.city({fire:'salt lake city'});
 
       expect(store.person.name).toEqual('jason');
       expect(store.person.age).toEqual(38);
       expect(store.person.friends.length).toEqual(1);
       expect(store.person.friends[0]).toEqual('alison');
+      expect(store.person.address != undefined).toEqual(true);
+      expect(store.person.address.city).toEqual('salt lake city');
 
     });
     it("should set object values", ()=>{

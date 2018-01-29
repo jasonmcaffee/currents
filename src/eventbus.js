@@ -73,7 +73,10 @@ class EventedProperty{
   setObject(objectToSet){
     // this.objectToSet = objectToSet;
     this.on((value, {fullPathNames})=>{
-      setObjectBasedOnFullPath({objectToSet, fullPathNames, value});
+      //omit the first fullPathName, since that represents the objectToSet.
+      //e.g. eventBus.person({objectToSet: person});
+      let [omit, ...remainingFullPathNames] = fullPathNames;
+      setObjectBasedOnFullPath({objectToSet, fullPathNames: remainingFullPathNames, value});
     });
   }
 
@@ -149,23 +152,25 @@ export function setObjectBasedOnFullPath({objectToSet, fullPathNames, value}){
   }
 
   //ensure there is something to set
-  let firstFullPathName = fullPathNames[0]
-  objectToSet[firstFullPathName] = objectToSet[firstFullPathName] || {};
+  let firstFullPathName = fullPathNames[0];
 
-  if(fullPathNames.length == 2){
+  if(fullPathNames.length == 1){
+    setValueBasedOnType({objectToSet, nameOfPropertyToSet: firstFullPathName, value});
+  }else if(fullPathNames.length == 2){
     //just set the value
+    objectToSet[firstFullPathName] = objectToSet[firstFullPathName] || {}; //ensure the property exists.
     let secondFullPathName = fullPathNames[1];
-    setValueBasedOnType({parent: objectToSet[firstFullPathName], nameOfPropertyToSet: secondFullPathName, value});
+    setValueBasedOnType({objectToSet: objectToSet[firstFullPathName], nameOfPropertyToSet: secondFullPathName, value});
   }else{
     let [discard, ...remainingFullPathNames] = fullPathNames;
-    setObjectBasedOnFullPath({objectToSet:objectToSet[firstFullPathName], fullPathNames:remainingFullPathNames, value});
+    setObjectBasedOnFullPath({objectToSet: objectToSet[firstFullPathName], fullPathNames:remainingFullPathNames, value});
   }
 }
 
-function setValueBasedOnType({parent, nameOfPropertyToSet, value}){
-  if(Array.isArray(parent[nameOfPropertyToSet])){
-    parent[nameOfPropertyToSet].push(value);
+function setValueBasedOnType({objectToSet, nameOfPropertyToSet, value}){
+  if(Array.isArray(objectToSet[nameOfPropertyToSet])){
+    objectToSet[nameOfPropertyToSet].push(value);
   }else{
-    parent[nameOfPropertyToSet] = value;
+    objectToSet[nameOfPropertyToSet] = value;
   }
 }
