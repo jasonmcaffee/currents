@@ -18,18 +18,29 @@ describe("nevernull", ()=>{
       ++eventListenerCallCount;
     }});
 
+    //register event listener on parent object (person)
+    let parentEventListenerCallCount = 0;
     let off2 = eventbus.person({on:(data, {name, fullPath, fullPathNames}) =>{
       console.log(`person on handler received data: `, data, `for name: ${name} fullPath: ${fullPath} fullPathNames: ${fullPathNames}`);
+      expect(name).toEqual('name');
+      expect(fullPath).toEqual('person.name');
+      expect(fullPathNames.length).toEqual(2);
+      expect(fullPathNames[0]).toEqual('person');
+      expect(fullPathNames[1]).toEqual('name');
+      ++parentEventListenerCallCount;
     }});
-    //fire event
+
+    //fire event, expecting both the person.name and person event handlers to be called.
     eventbus.person.name({fire:'jason mcaffee'});
 
     //unregister event handler
     off();
+    off2();
 
     eventbus.person.name({fire:'jason2'});
 
     expect(eventListenerCallCount).toEqual(1);
+    expect(parentEventListenerCallCount).toEqual(1);
   });
 
   describe("examples", ()=>{

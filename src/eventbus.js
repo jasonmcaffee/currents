@@ -87,16 +87,21 @@ class EventedProperty{
     this.fullPathNames = this.fullPath.split('.');
     this.name = name;
     this.eventedProperties = {};
+    this.parentEventedProperty = parentEventedProperty;
   }
 
   /**
    * todo: bubble up to parent.
    * @param data
    */
-  fire(data){
+  fire(data, context){
+    context = context || this;
     // console.log(`${this.fullPath} triggered with data: `, data);
     for(let i = 0, len=this.callbacks.length; i < len; ++i){
-      this.callbacks[i](data, this);
+      this.callbacks[i](data, context);
+    }
+    if(this.parentEventedProperty){
+      this.parentEventedProperty.fire(data, context);
     }
   }
   on(callback){
