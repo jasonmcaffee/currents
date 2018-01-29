@@ -1,6 +1,6 @@
-const {EventBus} = require('./../build/eventbus');
+const {EventBus, setObjectBasedOnFullPath} = require('./../build/eventbus');
 
-describe("nevernull", ()=>{
+describe("EventBus", ()=>{
 
   it("should allow event firing, registering, and unregistering for any property typed.", ()=>{
     //create the eventbus
@@ -73,6 +73,16 @@ describe("nevernull", ()=>{
       eventBus.person.name({off:callback});
       eventBus.person.name({fire:'ted'});
       expect(callCount).toEqual(1);
+    });
+
+  });
+
+  describe("setObjectBaseOnFullPath", ()=>{
+    it("should set object values", ()=>{
+      let objectToSet = {};
+      setObjectBasedOnFullPath({objectToSet, fullPathNames:['person', 'name'], value:'jason'});
+      expect(objectToSet.person !== undefined).toEqual(true);
+      expect(objectToSet.person.name).toEqual('jason');
     });
 
   });

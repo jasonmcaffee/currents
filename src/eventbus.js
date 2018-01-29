@@ -84,14 +84,6 @@ class EventedProperty{
     this.callbacks.splice(callbackIndex, 1);
     return callback;
   }
-  handleActionOld(action){
-    let propertyNames = Object.getOwnPropertyNames(action);
-    if(propertyNames.length != 1){ return console.error('invalid action: ', action); }
-    let actionName = propertyNames[0];
-    let actionValue = action[actionName];
-    if(typeof this[actionName] !== "function"){ return console.error('invalid action: ', action); }
-    return this[actionName](actionValue);
-  }
 
   handleAction(action){
     let {on, off, fire, ...rest} = action;
@@ -132,4 +124,38 @@ function calculateFullPath({parentEventedProperty, name, fullPath}){
     calculatedFullPath = name;
   }
   return calculatedFullPath;
+}
+
+/**
+ *
+ * @param objectToSet
+ * @param fullPathNames - e.g. ['person', 'name']
+ * @param value - e.g. 'jason'
+ */
+export function setObjectBasedOnFullPath({objectToSet, fullPathNames, value}){
+  if(fullPathNames.length == 0){
+    objectToSet = value;
+    return;
+  }
+
+  //ensure there is something to set
+  let firstFullPathName = fullPathNames[0]
+  objectToSet[firstFullPathName] = objectToSet[firstFullPathName] || {};
+
+  if(fullPathNames.length == 2){
+    //just set the value
+    let secondFullPathName = fullPathNames[1];
+    setValueBasedOnType({parent: objectToSet[firstFullPathName], nameOfPropertyToSet: secondFullPathName, value});
+  }else{
+    let [discard, ...remainingFullPathNames] = fullPathNames;
+    setObjectBasedOnFullPath({objectToSet:objectToSet[firstFullPathName], fullPathNames:remainingFullPathNames, value});
+  }
+}
+
+function setValueBasedOnType({parent, nameOfPropertyToSet, value}){
+  if(Array.isArray(parent[nameOfPropertyToSet])){
+    parent[nameOfPropertyToSet].push(value);
+  }else{
+    parent[nameOfPropertyToSet] = value;
+  }
 }
