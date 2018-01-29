@@ -49,6 +49,34 @@ describe("nevernull", ()=>{
     expect(parentEventListenerCallCount).toEqual(1);
   });
 
+  describe("off", ()=>{
+    it("should return an off function when on is called", ()=>{
+      let eventBus = new EventBus();
+      let callCount = 0;
+      let off = eventBus.person.name({on:()=>{
+        ++callCount;
+      }});
+      eventBus.person.name({fire:'jason'});
+      off();
+      eventBus.person.name({fire:'ted'});
+      expect(callCount).toEqual(1);
+    });
+
+    it("should provide an off action which unregisters a callback", ()=>{
+      let eventBus = new EventBus();
+      let callCount = 0;
+      let callback = ()=>{
+        ++callCount;
+      }
+      eventBus.person.name({on:callback});
+      eventBus.person.name({fire:'jason'});
+      eventBus.person.name({off:callback});
+      eventBus.person.name({fire:'ted'});
+      expect(callCount).toEqual(1);
+    });
+
+  });
+
   describe("examples", ()=>{
 
     it("should demonstrate registering, firing, and unregistering events", ()=>{

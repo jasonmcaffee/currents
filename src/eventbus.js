@@ -52,39 +52,64 @@ class EventedProperty{
     this.parentEventedProperty = parentEventedProperty;
   }
 
-  fire(data, context){
+  /**
+   *
+   * @param data - data to be sent to each callback.
+   * @param context - when child is fired, we want the parent to have access to the fullPath, etc. of the child.
+   * e.g. eventbus.person.on((data, {fullPath})=>{...})   eventbus.person.name(fire:'jason')
+   *      should result in person.on fullPath == 'person.name';
+   */
+  fire(data, {context}){
     context = context || this;
     // console.log(`${this.fullPath} triggered with data: `, data);
     for(let i = 0, len=this.callbacks.length; i < len; ++i){
       this.callbacks[i](data, context);
     }
     if(this.parentEventedProperty){
-      this.parentEventedProperty.fire(data, context);
+      this.parentEventedProperty.fire(data, {context});
     }
   }
 
   on(callback){
-    //return unregister function.
     this.callbacks.push(callback);
     let off = function(){
-      let callbackIndex = this.callbacks.indexOf(callback);
-      // console.log(`off removing callback at index`, callbackIndex);
-      if(callbackIndex < 0){return;}
-      this.callbacks.splice(callbackIndex, 1);
-      return callback;
+      return this.off(callback);
     }.bind(this);
     return off;
   }
-  // off(callback){
-  //
-  // }
-  handleAction(action){
+  off(callback){
+    let callbackIndex = this.callbacks.indexOf(callback);
+    // console.log(`off removing callback at index`, callbackIndex);
+    if(callbackIndex < 0){return;}
+    this.callbacks.splice(callbackIndex, 1);
+    return callback;
+  }
+  handleActionOld(action){
     let propertyNames = Object.getOwnPropertyNames(action);
     if(propertyNames.length != 1){ return console.error('invalid action: ', action); }
     let actionName = propertyNames[0];
     let actionValue = action[actionName];
     if(typeof this[actionName] !== "function"){ return console.error('invalid action: ', action); }
     return this[actionName](actionValue);
+  }
+
+  handleAction(action){
+    let {on, off, fire, ...rest} = action;
+    let result;
+    switch(true){
+      case on != undefined:
+        result = this.on(on, rest);
+        break;
+      case off !== undefined:
+        this.off(off, rest);
+        break;
+      case fire !== undefined:
+        result = this.fire(fire, rest);
+        break;
+      default:
+        console.error('invalid action: ', action);
+    }
+    return result;
   }
 }
 
