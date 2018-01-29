@@ -12,7 +12,7 @@ const nn = (eventedProperty)=>{
 
   //when a property is invoked as a function, pass the call down to EventedProperty.handleAction, which will use passed
   //in data to determine which action to perform (fire, on, off)
-  //e.g. eventbus.person.name({fire:'some data'}) will invoke this function.
+  //e.g. occurence.person.name({fire:'some data'}) will invoke this function.
   let eventedPropertyActionFunc = (action)=>{
     return eventedProperty.handleAction(action);
   };
@@ -56,7 +56,7 @@ class EventedProperty{
    *
    * @param data - data to be sent to each callback.
    * @param context - when child is fired, we want the parent to have access to the fullPath, etc. of the child.
-   * e.g. eventbus.person.on((data, {fullPath})=>{...})   eventbus.person.name(fire:'jason')
+   * e.g. occurence.person.on((data, {fullPath})=>{...})   occurence.person.name(fire:'jason')
    *      should result in person.on fullPath == 'person.name';
    */
   fire(data, {context}){

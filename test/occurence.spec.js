@@ -120,7 +120,7 @@ describe("Occurence", ()=>{
   describe("examples", ()=>{
 
     it("should demonstrate registering, firing, and unregistering events", ()=>{
-      //create the eventbus
+      //create the occurence
       let o = new Occurence();
 
       //register on event listener
@@ -144,7 +144,7 @@ describe("Occurence", ()=>{
           age: -1
         }
       };
-      //create the eventbus
+      //create the occurence
       let storeBus = new Occurence();
 
       //register on event listener
