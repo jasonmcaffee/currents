@@ -77,7 +77,27 @@ describe("EventBus", ()=>{
 
   });
 
-  describe("setObjectBaseOnFullPath", ()=>{
+  describe("setObject", ()=>{
+    fit("should provide a function for automatically setting properties based on event", ()=>{
+      let store = {
+        person:{
+          name: 'not set',
+          friends:[],
+        },
+      };
+
+      let eventBus = new EventBus();
+      eventBus.person({setObject:store});
+      eventBus.person.name({fire:'jason'});
+      eventBus.person.age({fire:38});
+      eventBus.person.friends({fire:'alison'});
+
+      expect(store.person.name).toEqual('jason');
+      expect(store.person.age).toEqual(38);
+      expect(store.person.friends.length).toEqual(1);
+      expect(store.person.friends[0]).toEqual('alison');
+
+    });
     it("should set object values", ()=>{
       let objectToSet = {};
       setObjectBasedOnFullPath({objectToSet, fullPathNames:['person', 'name'], value:'jason'});

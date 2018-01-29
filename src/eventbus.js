@@ -70,6 +70,13 @@ class EventedProperty{
     }
   }
 
+  setObject(objectToSet){
+    // this.objectToSet = objectToSet;
+    this.on((value, {fullPathNames})=>{
+      setObjectBasedOnFullPath({objectToSet, fullPathNames, value});
+    });
+  }
+
   on(callback){
     this.callbacks.push(callback);
     let off = function(){
@@ -86,7 +93,7 @@ class EventedProperty{
   }
 
   handleAction(action){
-    let {on, off, fire, ...rest} = action;
+    let {on, off, fire, setObject, ...rest} = action;
     let result;
     switch(true){
       case on != undefined:
@@ -97,6 +104,9 @@ class EventedProperty{
         break;
       case fire !== undefined:
         result = this.fire(fire, rest);
+        break;
+      case setObject !== undefined:
+        result = this.setObject(setObject);
         break;
       default:
         console.error('invalid action: ', action);
