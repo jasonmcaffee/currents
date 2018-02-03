@@ -1,2 +1,2 @@
-# occurence
-javascript event bus
+# Currents
+javascript event bus without the need of strings.

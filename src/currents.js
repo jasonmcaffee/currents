@@ -1,7 +1,7 @@
 //if Proxy is not natively supported, ensure polyfill is created.
 require('../vendor/reflect');
 
-export class Occurence{
+export class Currents{
   constructor({setObject}={}){
     let result = nn(new EventedProperty({name:'', fullPath:''}));
     if(setObject !== undefined){

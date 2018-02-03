@@ -1,13 +1,13 @@
 {
   "name": "currents",
-  "description": "javascript eventbus",
+  "description": "javascript eventbus without the need of strings",
   "version": "1.0.0",
   "license": "MIT",
-  "homepage": "https://github.com/jasonmcaffee/occurence",
+  "homepage": "https://github.com/jasonmcaffee/currents",
   "author": {
     "name": "Jason McAffee",
     "email": "jasonlmcaffee@gmail.com",
-    "url": "https://github.com/jasonmcaffee/occurence"
+    "url": "https://github.com/jasonmcaffee/currents"
   },
   "keywords": [
     "eventbus",
@@ -18,7 +18,7 @@
   "readmeFilename": "README.md",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jasonmcaffee/occurence.git"
+    "url": "https://github.com/jasonmcaffee/currents.git"
   },
   "engines": {
     "node": ">=6.0.0"
@@ -30,11 +30,11 @@
     "build-watch": "babel src test --out-dir build --source-maps --watch",
     "clean": "rm -rf build",
     "build": "npm run clean && npm run build-no-clean",
-    "dist": "cp build/occurence.js lib && cp build/occurence.js.map lib",
+    "dist": "cp build/currents.js lib && cp build/currents.js.map lib",
     "build-dist": "npm run build && npm run dist"
   },
   "bugs": {
-    "url": "https://github.com/jasonmcaffee/occurence/issues"
+    "url": "https://github.com/jasonmcaffee/currents/issues"
   },
   "dependencies": {},
   "devDependencies": {
@@ -45,5 +45,5 @@
     "babel-plugin-transform-object-rest-spread": "^6.16.0",
     "jasmine": "2.4.1"
   },
-  "main": "./lib/occurence.js"
+  "main": "./lib/currents.js"
 }

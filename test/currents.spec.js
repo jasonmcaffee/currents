@@ -1,10 +1,10 @@
-const {Occurence, setObjectBasedOnFullPath} = require('./../build/occurence');
+const {Currents, setObjectBasedOnFullPath} = require('./../build/currents');
 
-describe("Occurence", ()=>{
+describe("Currents", ()=>{
 
   it("should allow event firing, registering, and unregistering for any property typed.", ()=>{
     //create the o
-    let o = new Occurence();
+    let o = new Currents();
 
     //register on event listener
     let eventListenerCallCount = 0;
@@ -51,7 +51,7 @@ describe("Occurence", ()=>{
 
   describe("off", ()=>{
     it("should return an off function when on is called", ()=>{
-      let o = new Occurence();
+      let o = new Currents();
       let callCount = 0;
       let off = o.person.name({on:()=>{
         ++callCount;
@@ -63,7 +63,7 @@ describe("Occurence", ()=>{
     });
 
     it("should provide an off action which unregisters a callback", ()=>{
-      let o = new Occurence();
+      let o = new Currents();
       let callCount = 0;
       let callback = ()=>{
         ++callCount;
@@ -89,7 +89,7 @@ describe("Occurence", ()=>{
         },
       };
 
-      let o = new Occurence();
+      let o = new Currents();
       o.person({setObject:store.person}); //bad. need a name:'person' to enforce o.something.name doesn't set person.
       o.person.name({fire:'jason'});
       o.person.age({fire:38});
@@ -118,7 +118,7 @@ describe("Occurence", ()=>{
         },
       };
 
-      let o = new Occurence({setObject:store});
+      let o = new Currents({setObject:store});
       o.store.person.name({fire:'jason'});
       o.store.person.age({fire:38});
       o.store.person.friends({fire:'alison'});//default behavior is to add/push to arrays.
@@ -149,7 +149,7 @@ describe("Occurence", ()=>{
 
     it("should demonstrate registering, firing, and unregistering events", ()=>{
       //create the occurence
-      let o = new Occurence();
+      let o = new Currents();
 
       //register on event listener
       let off = o.person.name({on: (data, {name, fullPath, fullPathNames}) => {
@@ -173,7 +173,7 @@ describe("Occurence", ()=>{
         }
       };
       //create the occurence
-      let storeBus = new Occurence();
+      let storeBus = new Currents();
 
       //register on event listener
       storeBus.person.name({on: (data) => {
