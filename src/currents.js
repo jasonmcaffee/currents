@@ -71,14 +71,14 @@ class EventedProperty{
     }
   }
 
-  setObject(objectToSet){
+  setObject(objectToSet, {setValue=defaultSetValue}){
     // this.objectToSet = objectToSet;
     this.on((value, {fullPathNames})=>{
       //omit the first fullPathName, since that represents the objectToSet.
       //e.g. eventBus.person({objectToSet: person});
       let [omit, ...remainingFullPathNames] = fullPathNames;
       fullPathNames = remainingFullPathNames;
-      setObjectBasedOnFullPath({objectToSet, fullPathNames, value});
+      setObjectBasedOnFullPath({objectToSet, fullPathNames, value, setValue});
     });
   }
   //todo: once
@@ -111,7 +111,7 @@ class EventedProperty{
         result = this.fire(fire, rest);
         break;
       case setObject !== undefined:
-        result = this.setObject(setObject);
+        result = this.setObject(setObject, rest);
         break;
       default:
         console.error('invalid action: ', action);
@@ -147,33 +147,42 @@ function calculateFullPath({parentEventedProperty, name, fullPath}){
  * @param fullPathNames - e.g. ['person', 'name']
  * @param value - e.g. 'jason'
  */
-export function setObjectBasedOnFullPath({objectToSet, fullPathNames, value}){
+export function setObjectBasedOnFullPath({objectToSet, fullPathNames, value, parentObject, objectToSetPropertyNameOnParent, setValue=defaultSetValue}){
   if(fullPathNames.length == 0){
     objectToSet = value;
     return;
   }
-
   //ensure there is something to set
   let firstFullPathName = fullPathNames[0];
 
   if(fullPathNames.length == 1){
-    setValue({objectToSet, nameOfPropertyToSet: firstFullPathName, value});
-  }else if(fullPathNames.length == 2){
-    //just set the value
-    objectToSet[firstFullPathName] = objectToSet[firstFullPathName] || {}; //ensure the property exists.
-    let secondFullPathName = fullPathNames[1];
-    setValue({objectToSet: objectToSet[firstFullPathName], nameOfPropertyToSet: secondFullPathName, value});
+    setValue({objectToSet, nameOfPropertyToSet: firstFullPathName, value, parentObject, objectToSetPropertyNameOnParent});
   }else{
-    let [discard, ...remainingFullPathNames] = fullPathNames;
-    setObjectBasedOnFullPath({objectToSet: objectToSet[firstFullPathName], fullPathNames:remainingFullPathNames, value});
+    let [objectToSetPropertyNameOnParent, ...remainingFullPathNames] = fullPathNames;
+    let parentObject = objectToSet;
+    setObjectBasedOnFullPath({
+      objectToSet: objectToSet[firstFullPathName],
+      fullPathNames:remainingFullPathNames,
+      value,
+      parentObject,
+      objectToSetPropertyNameOnParent,
+      setValue,
+    });
   }
 }
 
-function setValue({objectToSet, nameOfPropertyToSet, value}){
-  objectToSet[nameOfPropertyToSet] = value;
-  // if(Array.isArray(objectToSet[nameOfPropertyToSet])){
-  //   objectToSet[nameOfPropertyToSet].push(value);
-  // }else{
-  //   objectToSet[nameOfPropertyToSet] = value;
-  // }
+function defaultSetValue({objectToSet, nameOfPropertyToSet, value, parentObject, objectToSetPropertyNameOnParent}){
+  //shouldn't ever happen, but check for it anyways.
+  if(parentObject === undefined && objectToSet === undefined){
+    console.error('setValue unable to set value of undefined parentObject and undefined objectToSet', {objectToSet, nameOfPropertyToSet, value, parentObject, objectToSetPropertyNameOnParent} );
+  }
+  if(objectToSet !== undefined){
+    if(typeof objectToSet === "object"){
+      objectToSet[nameOfPropertyToSet] = value;
+    }else{
+      console.error('setValue unable to set values on non objects', {objectToSet, nameOfPropertyToSet, value, parentObject, objectToSetPropertyNameOnParent});
+    }
+  }else if(parentObject !== undefined){
+    parentObject[objectToSetPropertyNameOnParent] = {[nameOfPropertyToSet]: value};
+  }
 }
