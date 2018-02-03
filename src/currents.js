@@ -73,7 +73,9 @@ class EventedProperty{
 
   setObject(objectToSet, {setValue=defaultSetValue}){
     // this.objectToSet = objectToSet;
-    this.on((value, {fullPathNames})=>{
+    this.setValue = setValue;
+    this.on((value, eventedProperty)=>{
+      let {fullPathNames, setValue} = eventedProperty;
       //omit the first fullPathName, since that represents the objectToSet.
       //e.g. eventBus.person({objectToSet: person});
       let [omit, ...remainingFullPathNames] = fullPathNames;
@@ -81,6 +83,11 @@ class EventedProperty{
       setObjectBasedOnFullPath({objectToSet, fullPathNames, value, setValue});
     });
   }
+
+  onSetValue(setValueFunction){
+    this.setValue = setValueFunction;
+  }
+
   //todo: once
   on(callback){
     this.callbacks.push(callback);
@@ -112,6 +119,9 @@ class EventedProperty{
         break;
       case setObject !== undefined:
         result = this.setObject(setObject, rest);
+        break;
+      case onSetValue !== undefined:
+        result = this.onSetValue(onSetValue);
         break;
       default:
         console.error('invalid action: ', action);

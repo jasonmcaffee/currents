@@ -114,31 +114,29 @@ describe("Currents", ()=>{
     it("should provide a customization of setting properties", ()=>{
       let store = {
         person:{
-          name: '',
           friends:['todd'],
-          // address:{   <-- doesn't exist, but will be created
-          //   city: ''
-          // }
         },
       };
 
       let o = new Currents();
       o.store({setObject: store});
-      o.store.person.name({fire:'jason'});
-      o.store.person.age({fire:38});
-      o.store.person.friends({fire:['alison']});
+
+      //customize setting the friends array, so that it pushes, rather than sets the value.
+      let friendsOnSetValueCallCount = 0;
+      o.store.person.friends({onSetValue: ({objectToSet, nameOfPropertyToSet, value, parentObject, objectToSetPropertyNameOnParent})=>{
+        objectToSet[nameOfPropertyToSet].push(value);
+        ++friendsOnSetValueCallCount;
+      }});
+      o.store.person.friends({fire:'alison'});
+
+      expect(store.person.friends.length).toEqual(2);
+      expect(store.person.friends[0]).toEqual('todd');
+      expect(store.person.friends[1]).toEqual('alison');
+
+      expect(friendsOnSetValueCallCount).toEqual(1);
 
       //set non existent property results in address object being created.
       o.store.person.address.city({fire:'salt lake city'});
-
-      //set unrelated properties
-      o.somethingUnrelated.person.name({fire:'shouldnt apply to store'});
-      o.somethingUnrelated.person.age({fire:'shouldnt apply to store'});
-
-      expect(store.person.name).toEqual('jason');
-      expect(store.person.age).toEqual(38);
-      expect(store.person.friends.length).toEqual(1);
-      expect(store.person.friends[0]).toEqual('alison');
       expect(store.person.address != undefined).toEqual(true);
       expect(store.person.address.city).toEqual('salt lake city');
 
