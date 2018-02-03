@@ -60,7 +60,7 @@ class EventedProperty{
    * e.g. occurence.person.on((data, {fullPath})=>{...})   occurence.person.name(fire:'jason')
    *      should result in person.on fullPath == 'person.name';
    */
-  fire(data, {context}){
+  fire(data, {context}={}){
     context = context || this;
     // console.log(`${this.fullPath} triggered with data: `, data);
     for(let i = 0, len=this.callbacks.length; i < len; ++i){
@@ -71,7 +71,7 @@ class EventedProperty{
     }
   }
 
-  setObject(objectToSet, {setValue=defaultSetValue}){
+  setObject(objectToSet, {setValue=defaultSetValue}={}){
     // this.objectToSet = objectToSet;
     this.setValue = setValue;
     this.on((value, eventedProperty)=>{
@@ -105,6 +105,9 @@ class EventedProperty{
   }
 
   handleAction(action){
+    if(action === undefined){
+      return this;
+    }
     let {on, off, fire, setObject, onSetValue, ...rest} = action;
     let result;
     switch(true){
