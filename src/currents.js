@@ -2,11 +2,8 @@
 require('../vendor/reflect');
 
 export class Currents{
-  constructor({setObject}={}){
+  constructor(){
     let result = nn(new EventedProperty({name:'', fullPath:''}));
-    if(setObject !== undefined){
-      result({setObject});
-    }
     return result;
   }
 }
@@ -101,7 +98,7 @@ class EventedProperty{
   }
 
   handleAction(action){
-    let {on, off, fire, setObject, ...rest} = action;
+    let {on, off, fire, setObject, onSetValue, ...rest} = action;
     let result;
     switch(true){
       case on != undefined:
@@ -145,7 +142,7 @@ function calculateFullPath({parentEventedProperty, name, fullPath}){
 }
 
 /**
- * todo: if value is an object, recursively grab it props and set. don't just assign value directly.
+ *
  * @param objectToSet
  * @param fullPathNames - e.g. ['person', 'name']
  * @param value - e.g. 'jason'
@@ -160,22 +157,23 @@ export function setObjectBasedOnFullPath({objectToSet, fullPathNames, value}){
   let firstFullPathName = fullPathNames[0];
 
   if(fullPathNames.length == 1){
-    setValueBasedOnType({objectToSet, nameOfPropertyToSet: firstFullPathName, value});
+    setValue({objectToSet, nameOfPropertyToSet: firstFullPathName, value});
   }else if(fullPathNames.length == 2){
     //just set the value
     objectToSet[firstFullPathName] = objectToSet[firstFullPathName] || {}; //ensure the property exists.
     let secondFullPathName = fullPathNames[1];
-    setValueBasedOnType({objectToSet: objectToSet[firstFullPathName], nameOfPropertyToSet: secondFullPathName, value});
+    setValue({objectToSet: objectToSet[firstFullPathName], nameOfPropertyToSet: secondFullPathName, value});
   }else{
     let [discard, ...remainingFullPathNames] = fullPathNames;
     setObjectBasedOnFullPath({objectToSet: objectToSet[firstFullPathName], fullPathNames:remainingFullPathNames, value});
   }
 }
 
-function setValueBasedOnType({objectToSet, nameOfPropertyToSet, value}){
-  if(Array.isArray(objectToSet[nameOfPropertyToSet])){
-    objectToSet[nameOfPropertyToSet].push(value);
-  }else{
-    objectToSet[nameOfPropertyToSet] = value;
-  }
+function setValue({objectToSet, nameOfPropertyToSet, value}){
+  objectToSet[nameOfPropertyToSet] = value;
+  // if(Array.isArray(objectToSet[nameOfPropertyToSet])){
+  //   objectToSet[nameOfPropertyToSet].push(value);
+  // }else{
+  //   objectToSet[nameOfPropertyToSet] = value;
+  // }
 }

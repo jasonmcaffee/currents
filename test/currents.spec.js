@@ -81,8 +81,8 @@ describe("Currents", ()=>{
     it("should provide a function for automatically setting properties based on event", ()=>{
       let store = {
         person:{
-          name: 'not set',
-          friends:[],
+          name: '',
+          friends:['todd'],
           // address:{   <-- doesn't exist, but will be created
           //   city: ''
           // }
@@ -90,13 +90,17 @@ describe("Currents", ()=>{
       };
 
       let o = new Currents();
-      o.person({setObject:store.person}); //bad. need a name:'person' to enforce o.something.name doesn't set person.
-      o.person.name({fire:'jason'});
-      o.person.age({fire:38});
-      o.person.friends({fire:'alison'});//default behavior is to add/push to arrays.
+      o.store({setObject: store});
+      o.store.person.name({fire:'jason'});
+      o.store.person.age({fire:38});
+      o.store.person.friends({fire:['alison']});
 
-      //set non existent property
-      o.person.address.city({fire:'salt lake city'});
+      //set non existent property results in address object being created.
+      o.store.person.address.city({fire:'salt lake city'});
+
+      //set unrelated properties
+      o.somethingUnrelated.person.name({fire:'shouldnt apply to store'});
+      o.somethingUnrelated.person.age({fire:'shouldnt apply to store'});
 
       expect(store.person.name).toEqual('jason');
       expect(store.person.age).toEqual(38);
@@ -107,24 +111,29 @@ describe("Currents", ()=>{
 
     });
 
-    it("should provide a constructor option for automatically setting properties based on event", ()=>{
+    it("should provide a customization of setting properties", ()=>{
       let store = {
         person:{
-          name: 'not set',
-          friends:[],
+          name: '',
+          friends:['todd'],
           // address:{   <-- doesn't exist, but will be created
           //   city: ''
           // }
         },
       };
 
-      let o = new Currents({setObject:store});
+      let o = new Currents();
+      o.store({setObject: store});
       o.store.person.name({fire:'jason'});
       o.store.person.age({fire:38});
-      o.store.person.friends({fire:'alison'});//default behavior is to add/push to arrays.
+      o.store.person.friends({fire:['alison']});
 
-      //set non existent property
+      //set non existent property results in address object being created.
       o.store.person.address.city({fire:'salt lake city'});
+
+      //set unrelated properties
+      o.somethingUnrelated.person.name({fire:'shouldnt apply to store'});
+      o.somethingUnrelated.person.age({fire:'shouldnt apply to store'});
 
       expect(store.person.name).toEqual('jason');
       expect(store.person.age).toEqual(38);
@@ -134,7 +143,6 @@ describe("Currents", ()=>{
       expect(store.person.address.city).toEqual('salt lake city');
 
     });
-
 
     it("should set object values", ()=>{
       let objectToSet = {};
