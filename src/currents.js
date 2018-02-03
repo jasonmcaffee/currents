@@ -96,6 +96,7 @@ class EventedProperty{
     }.bind(this);
     return off;
   }
+
   off(callback){
     let callbackIndex = this.callbacks.indexOf(callback);
     // console.log(`off removing callback at index`, callbackIndex);

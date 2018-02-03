@@ -118,13 +118,17 @@ describe("Currents", ()=>{
       };
 
       let o = new Currents();
-      o.store({setObject: store});
+      o.store().setObject(store);
 
       //customize setting the friends array, so that it pushes, rather than sets the value.
       let friendsOnSetValueCallCount = 0;
       o.store.person.friends().onSetValue(({objectToSet, nameOfPropertyToSet, value, parentObject, objectToSetPropertyNameOnParent})=>{
         objectToSet[nameOfPropertyToSet].push(value);
         ++friendsOnSetValueCallCount;
+      });
+
+      o.store().onSetValue(({objectToSet, nameOfPropertyToSet, value, parentObject, objectToSetPropertyNameOnParent})=>{
+        console.log(`name of property to set`, nameOfPropertyToSet);
       });
       o.store.person.friends().fire('alison');
 
@@ -171,7 +175,7 @@ describe("Currents", ()=>{
     it("should demonstrate maintaining a global store/state", ()=>{
       let store = {
         person:{
-          name: 'not set',
+          name: '',
           age: -1
         }
       };
@@ -190,6 +194,28 @@ describe("Currents", ()=>{
       //fire event
       storeBus.person.name().fire('jason mcaffee');
       storeBus.person.age().fire(38);
+
+      expect(store.person.name).toEqual('jason mcaffee');
+      expect(store.person.age).toEqual(38);
+    });
+
+    it("should demonstrate maintaining a global store/state when entire sub properties are updated", ()=>{
+      let store = {
+        person:{
+          name: '',
+          age: -1
+        }
+      };
+      //create the occurence
+      let storeBus = new Currents();
+
+      //register on event listener
+      storeBus.person().on((data) => {
+        store.person = data;
+      });
+
+      //fire event
+      storeBus.person().fire({name: 'jason mcaffee', age: 38});
 
       expect(store.person.name).toEqual('jason mcaffee');
       expect(store.person.age).toEqual(38);
