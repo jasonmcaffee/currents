@@ -4,10 +4,10 @@ require('./App.css');
 require('todomvc-app-css/index.css');
 import Header from './Header';
 import MainSection from './MainSection';
-import StoreCurrent from '../models/StoreCurrent';
+import Store from '../models/Store';
 
-const storeCurrent = new StoreCurrent();
-const todosCurrent = storeCurrent.todos;
+const store = new Store();
+const todosCurrent = store.currents.todos;
 
 export default class App extends Component{
   constructor(){
@@ -18,7 +18,7 @@ export default class App extends Component{
     return (
       <div>
         <Header todosCurrent={todosCurrent} />
-        <MainSection todos={storeCurrent.store.todos} todosCurrent={todosCurrent} />
+        <MainSection todos={store.todos} todosCurrent={todosCurrent} />
       </div>
     );
   }

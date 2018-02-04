@@ -14,13 +14,17 @@ const TODO_FILTERS = {
 }
 
 export default class MainSection extends Component {
-  // static propTypes = {
-  //   todos: PropTypes.array.isRequired,
-  //   todosCurrent: PropTypes.object.isRequired
-  // }
 
-  state = { filter: SHOW_ALL }
-
+  constructor(props){
+    super(props);
+    const {todos} = props;
+    this.state = {todos, filter: SHOW_ALL};
+    this.listen();
+  }
+  listen(){
+    const self = this;
+    this.props.todosCurrent.changed().on(todos => self.setState({todos}));
+  }
   handleClearCompleted = () => {
     this.props.todosCurrent.clearCompleted().fire();
   }
@@ -30,7 +34,9 @@ export default class MainSection extends Component {
   }
 
   renderToggleAll(completedCount) {
-    const { todos, todosCurrent } = this.props;
+    const {todosCurrent} = this.props;
+    const {todos} = this.state;
+
     if (todos.length > 0) {
       return (
         <span>
@@ -45,9 +51,8 @@ export default class MainSection extends Component {
   }
 
   renderFooter(completedCount) {
-    const { todos } = this.props
-    const { filter } = this.state
-    const activeCount = todos.length - completedCount
+    const { filter, todos } = this.state;
+    const activeCount = todos.length - completedCount;
 
     if (todos.length) {
       return (
@@ -61,8 +66,8 @@ export default class MainSection extends Component {
   }
 
   render() {
-    const { todos, actions } = this.props
-    const { filter } = this.state
+    const { todosCurrent } = this.props;
+    const { filter, todos } = this.state;
 
     const filteredTodos = todos.filter(TODO_FILTERS[filter])
     const completedCount = todos.reduce((count, todo) =>
@@ -75,7 +80,7 @@ export default class MainSection extends Component {
         {this.renderToggleAll(completedCount)}
         <ul className="todo-list">
           {filteredTodos.map(todo =>
-            <TodoItem key={todo.id} todo={todo} {...actions} />
+            <TodoItem key={todo.id} todo={todo} todosCurrent={todosCurrent} />
           )}
         </ul>
         {this.renderFooter(completedCount)}

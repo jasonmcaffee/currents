@@ -221,6 +221,25 @@ describe("Currents", ()=>{
       expect(store.person.age).toEqual(38);
     });
 
+    it('should keep bind context', ()=>{
+      let handleCount = 0;
+      class Store {
+        constructor(){
+          this.currents = new Currents();
+          this.currents.store().on(this.handle.bind(this));
+          this.isStore = true;
+          this.currents.store().fire();
+        }
+        handle(){
+          expect(this.isStore).toEqual(true);
+          handleCount++;
+        }
+      }
+      const store = new Store();
+      expect(handleCount).toEqual(1);
+
+
+    });
   });
 
 

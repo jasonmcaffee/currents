@@ -4,61 +4,46 @@ import classnames from 'classnames'
 import TodoTextInput from './TodoTextInput'
 
 export default class TodoItem extends Component {
-  static propTypes = {
-    todo: PropTypes.object.isRequired,
-    editTodo: PropTypes.func.isRequired,
-    deleteTodo: PropTypes.func.isRequired,
-    completeTodo: PropTypes.func.isRequired
-  }
-
   state = {
     editing: false
   }
 
   handleDoubleClick = () => {
-    this.setState({ editing: true })
+    this.setState({ editing: true });
   }
 
-  handleSave = (id, text) => {
+  handleSave = (todo, text) => {
+    const {todosCurrent} = this.props;
     if (text.length === 0) {
-      this.props.deleteTodo(id)
+      todosCurrent().deleteTodo(todo);
     } else {
-      this.props.editTodo(id, text)
+      todosCurrent().editTodo(todo, {text});
     }
     this.setState({ editing: false })
   }
 
   render() {
-    const { todo, completeTodo, deleteTodo } = this.props
+    const { todo, todosCurrent } = this.props;
 
-    let element
+    let element;
     if (this.state.editing) {
       element = (
-        <TodoTextInput text={todo.text}
-                       editing={this.state.editing}
-                       onSave={(text) => this.handleSave(todo.id, text)} />
+        <TodoTextInput text={todo.text} editing={this.state.editing} onSave={(text) => this.handleSave(todo, text)} />
       )
     } else {
       element = (
         <div className="view">
-          <input className="toggle"
-                 type="checkbox"
-                 checked={todo.completed}
-                 onChange={() => completeTodo(todo.id)} />
+          <input className="toggle" type="checkbox" checked={todo.completed} onChange={() => todosCurrent().completeTodo(todo)} />
           <label onDoubleClick={this.handleDoubleClick}>
             {todo.text}
           </label>
-          <button className="destroy"
-                  onClick={() => deleteTodo(todo.id)} />
+          <button className="destroy" onClick={() => todosCurrent().deleteTodo(todo)} />
         </div>
       )
     }
 
     return (
-      <li className={classnames({
-        completed: todo.completed,
-        editing: this.state.editing
-      })}>
+      <li className={classnames({completed: todo.completed, editing: this.state.editing})}>
         {element}
       </li>
     )
