@@ -15,9 +15,9 @@ export default class TodoItem extends Component {
   handleSave = (todo, text) => {
     const {todosCurrent} = this.props;
     if (text.length === 0) {
-      todosCurrent().deleteTodo(todo);
+      todosCurrent.deleteTodo().fire(todo);
     } else {
-      todosCurrent().editTodo(todo, {text});
+      todosCurrent.editTodo().fire({todo, text});//cant do this. 1 param.
     }
     this.setState({ editing: false })
   }
@@ -33,11 +33,11 @@ export default class TodoItem extends Component {
     } else {
       element = (
         <div className="view">
-          <input className="toggle" type="checkbox" checked={todo.completed} onChange={() => todosCurrent().completeTodo(todo)} />
+          <input className="toggle" type="checkbox" checked={todo.completed} onChange={() => todosCurrent.completeTodo().fire(todo)} />
           <label onDoubleClick={this.handleDoubleClick}>
             {todo.text}
           </label>
-          <button className="destroy" onClick={() => todosCurrent().deleteTodo(todo)} />
+          <button className="destroy" onClick={() => todosCurrent.deleteTodo().fire(todo)} />
         </div>
       )
     }

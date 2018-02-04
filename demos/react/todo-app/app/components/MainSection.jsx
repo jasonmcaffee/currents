@@ -23,7 +23,13 @@ export default class MainSection extends Component {
   }
   listen(){
     const self = this;
-    this.props.todosCurrent.changed().on(todos => self.setState({todos}));
+    this.offs = [
+      this.props.todosCurrent.changed().on(todos => self.setState({todos}))
+    ];
+  }
+  componentWillUnmount(){
+    console.log(`MainSection unmounting. calling offs`);
+    this.offs.forEach(off=>off());
   }
   handleClearCompleted = () => {
     this.props.todosCurrent.clearCompleted().fire();
@@ -40,11 +46,8 @@ export default class MainSection extends Component {
     if (todos.length > 0) {
       return (
         <span>
-          <input className="toggle-all"
-                 type="checkbox"
-                 checked={completedCount === todos.length}
-          />
-          <label onClick={todosCurrent.completeAll().fire()}/>
+          <input className="toggle-all" type="checkbox" checked={completedCount === todos.length}/>
+          <label onClick={()=>todosCurrent.completeAll().fire()}/>
         </span>
       )
     }
@@ -56,11 +59,7 @@ export default class MainSection extends Component {
 
     if (todos.length) {
       return (
-        <Footer completedCount={completedCount}
-                activeCount={activeCount}
-                filter={filter}
-                onClearCompleted={this.handleClearCompleted}
-                onShow={this.handleShow} />
+        <Footer completedCount={completedCount} activeCount={activeCount} filter={filter} onClearCompleted={this.handleClearCompleted} onShow={this.handleShow} />
       )
     }
   }

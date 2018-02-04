@@ -19,32 +19,38 @@ export default class Store{
   }
 
   addTodo({id=generateRandomInt(), text, completed=false}){
+    console.log(`store addTodo called: `, {id, text, completed});
     const todo = {text, completed};
     this.todos.push(todo);
     this.currents.todos.changed().fire(this.todos);
   }
 
   clearCompleted(){
+    console.log(`store clearCompleted called`);
     this.todos = this.todos.filter(todo => !todo.completed);
     this.currents.todos.changed().fire(this.todos);
   }
 
   completeAll(){
+    console.log(`store completeAll called`);
     this.todos.map(this.completeTodo.bind(this));
   }
 
   completeTodo(todo){
+    console.log(`store completeTodo called`, todo);
     todo.completed = true;
     this.currents.todos.changed().fire(this.todos);
   }
 
   deleteTodo(todo){
+    console.log(`store deleteTodo called`, todo);
     const todoIndex = this.todos.indexOf(todo);
-    this.todos.slice(todoIndex, 1);
+    this.todos.splice(todoIndex, 1);
     this.currents.todos.changed().fire(this.todos);
   }
 
-  editTodo(todo, {text}){
+  editTodo({todo, text}){
+    console.log(`store editTodo called`, todo, text);
     todo.text = text;
     this.currents.todos.changed().fire(this.todos);
   }
