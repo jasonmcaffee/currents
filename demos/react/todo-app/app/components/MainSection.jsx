@@ -17,72 +17,56 @@ export default class MainSection extends Component {
 
   constructor(props){
     super(props);
-    const {todos} = props;
-    this.state = {todos, filter: SHOW_ALL};
-    this.listen();
+    const {todos, todosCurrents, mainSectionModel} = props;
+    this.state = {todos, mainSectionModel}; // store todosModel in state so that we can setState when changed, and re-render.
+    this.listen({todosCurrents});
   }
-  listen(){
+
+  listen({todosCurrents}){
     const self = this;
     this.offs = [
-      this.props.todosCurrent.changed().on(todos => self.setState({todos}))
+      todosCurrents.changed().on(todos => self.setState({todos})),
     ];
   }
   componentWillUnmount(){
     console.log(`MainSection unmounting. calling offs`);
     this.offs.forEach(off=>off());
   }
-  handleClearCompleted = () => {
-    this.props.todosCurrent.clearCompleted().fire();
-  }
 
-  handleShow = filter => {
-    this.setState({ filter });
-  }
-
-  renderToggleAll(completedCount) {
-    const {todosCurrent} = this.props;
+  //todo: use toggle state rather than this current implementation.
+  renderToggleAll() {
+    const {todosCurrents} = this.props;
     const {todos} = this.state;
-
     if (todos.length > 0) {
       return (
         <span>
-          <input className="toggle-all" type="checkbox" checked={completedCount === todos.length}/>
-          <label onClick={()=>todosCurrent.completeAll().fire()}/>
+          <input className="toggle-all" type="checkbox" checked={todos.every(t=>t.completed)}/>
+          <label onClick={()=>todosCurrents.toggle().fire()}/>
         </span>
       )
     }
   }
 
-  renderFooter(completedCount) {
-    const { filter, todos } = this.state;
-    const activeCount = todos.length - completedCount;
+  renderFooter() {
+    const { todosCurrents, footerModel } = this.props;
 
-    if (todos.length) {
-      return (
-        <Footer completedCount={completedCount} activeCount={activeCount} filter={filter} onClearCompleted={this.handleClearCompleted} onShow={this.handleShow} />
-      )
-    }
+    return (
+      <Footer footerModel={footerModel} todosCurrents={todosCurrents} />
+    );
   }
 
   render() {
-    const { todosCurrent } = this.props;
-    const { filter, todos } = this.state;
-
-    const filteredTodos = todos.filter(TODO_FILTERS[filter])
-    const completedCount = todos.reduce((count, todo) =>
-        todo.completed ? count + 1 : count,
-      0
-    )
-
+    const { todosCurrents } = this.props;
+    const { todos } = this.state;
     return (
       <section className="main">
-        {this.renderToggleAll(completedCount)}
+        {this.renderToggleAll()}
         <ul className="todo-list">
-          {filteredTodos.map(todo =>
-            <TodoItem key={todo.id} todo={todo} todosCurrent={todosCurrent} />
+          {todos.map(todo =>
+            <TodoItem key={todo.id} todo={todo} todosCurrent={todosCurrents} />
           )}
         </ul>
-        {this.renderFooter(completedCount)}
+        {this.renderFooter()}
       </section>
     )
   }

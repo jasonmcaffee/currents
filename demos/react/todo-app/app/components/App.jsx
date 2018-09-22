@@ -7,7 +7,7 @@ import MainSection from './MainSection';
 import Store from '../models/Store';
 
 const store = new Store();
-const todosCurrent = store.currents.todos;
+const todosCurrents = store.currents.todos;
 
 export default class App extends Component{
   constructor(){
@@ -17,8 +17,8 @@ export default class App extends Component{
   render(){
     return (
       <div>
-        <Header todosCurrent={todosCurrent} />
-        <MainSection todos={store.todos} todosCurrent={todosCurrent} />
+        <Header todosCurrent={todosCurrents} />
+        <MainSection todos={store.todos} mainSectionModel={store.mainSectionModel} footerModel={store.footerModel} todosCurrents={todosCurrents} />
       </div>
     );
   }
